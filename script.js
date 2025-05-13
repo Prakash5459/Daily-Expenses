@@ -32,8 +32,9 @@ document.getElementById('expenseForm').addEventListener('submit', function (e) {
 
 let pieChart, barChart;
 
-function renderCharts() {
-  const data = JSON.parse(localStorage.getItem('expenses')) || [];
+function renderCharts(filteredData = null) {
+  const data = filteredData || JSON.parse(localStorage.getItem('expenses')) || [];
+  expenses = data;
 
   // --- PIE CHART: Group by category ---
   const categoryTotals = {};
@@ -89,12 +90,14 @@ function renderCharts() {
       }
     }
   });
+
+  renderTable(data);
 }
 
-// Initial load
-renderCharts();
+// ------------------------
+// Render Expense Table
+// ------------------------
 
-// Render expense table
 function renderTable(filtered = expenses) {
   const tbody = document.querySelector('#expenseTable tbody');
   tbody.innerHTML = '';
@@ -102,6 +105,7 @@ function renderTable(filtered = expenses) {
   if (filtered.length === 0) {
     const row = `<tr><td colspan="4" style="text-align:center;">No expenses found.</td></tr>`;
     tbody.innerHTML = row;
+    animateTotalAmount(0);
     return;
   }
 
@@ -115,28 +119,91 @@ function renderTable(filtered = expenses) {
       </tr>`;
     tbody.innerHTML += row;
   });
+
+  const total = filtered.reduce((sum, exp) => sum + exp.amount, 0);
+  animateTotalAmount(total);
 }
 
-// Date range filtering
+// ------------------------
+// Animated Total Counter
+// ------------------------
+
+function animateTotalAmount(amount) {
+  const el = document.getElementById('totalAmount');
+  const duration = 500;
+  const start = parseFloat(el.textContent) || 0;
+  const startTime = performance.now();
+
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const value = start + (amount - start) * progress;
+    el.textContent = value.toFixed(2);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+}
+
+// ------------------------
+// Filter by Date Range
+// ------------------------
+
 document.getElementById('filterBtn').addEventListener('click', () => {
   const start = document.getElementById('startDate').value;
   const end = document.getElementById('endDate').value;
 
   let filtered = expenses;
 
-  if (start && end) {
-    filtered = expenses.filter(exp => exp.date >= start && exp.date <= end);
+  if (start) {
+    filtered = filtered.filter(exp => exp.date >= start);
+  }
+  if (end) {
+    filtered = filtered.filter(exp => exp.date <= end);
   }
 
-  renderTable(filtered);
+  renderCharts(filtered);
 });
 
-// Clear all expenses
+// ------------------------
+// Clear All Button
+// ------------------------
+
 document.getElementById('clearAllBtn').addEventListener('click', () => {
   if (confirm("Are you sure you want to delete all expenses?")) {
     localStorage.removeItem('expenses');
     expenses = [];
     renderCharts();
-    renderTable([]);
   }
 });
+
+// ------------------------
+// Export to CSV
+// ------------------------
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (expenses.length === 0) {
+    alert("No expenses to export.");
+    return;
+  }
+
+  const headers = ['Date', 'Category', 'Amount', 'Note'];
+  const rows = expenses.map(exp =>
+    [exp.date, exp.category, exp.amount.toFixed(2), `"${exp.note || ''}"`]
+  );
+
+  let csvContent = "data:text/csv;charset=utf-8,"
+    + headers.join(",") + "\n"
+    + rows.map(r => r.join(",")).join("\n");
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "expenses.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
+// Initial Load
+renderCharts();

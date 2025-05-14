@@ -1,8 +1,13 @@
+/* ========== BASE STYLES ========== */
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin: 0;
   padding: 0;
   background: #f5f7fa;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 .container {
@@ -12,17 +17,25 @@ body {
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-sizing: border-box;
 }
 
 h2, h3 {
   text-align: center;
   margin-bottom: 1rem;
+  color: #333;
 }
 
+/* ========== CHART AREA ========== */
 .chart-wrapper {
   margin: 2rem 0;
 }
 
+.chart-wrapper canvas {
+  max-width: 100%;
+}
+
+/* ========== FORM AREA ========== */
 form {
   display: flex;
   flex-direction: column;
@@ -30,25 +43,39 @@ form {
   margin-bottom: 2rem;
 }
 
-form input, form select, form button {
+form label {
+  font-weight: 600;
+  color: #444;
+}
+
+form input, form select {
   padding: 0.75rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
+  -webkit-appearance: none;
+}
+
+form input::placeholder {
+  color: #999;
 }
 
 form button {
   background-color: #007bff;
   color: white;
-  cursor: pointer;
+  padding: 0.75rem;
+  font-size: 1rem;
   border: none;
-  transition: background 0.3s ease;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 form button:hover {
   background-color: #0056b3;
 }
 
+/* ========== FILTERS ========== */
 .filters {
   display: flex;
   gap: 0.75rem;
@@ -81,6 +108,7 @@ button.danger:hover {
   background-color: #b62a36;
 }
 
+/* ========== TABLE ========== */
 .table-wrapper {
   margin-top: 2rem;
   overflow-x: auto;
@@ -103,6 +131,7 @@ thead {
   font-weight: bold;
 }
 
+/* ========== TOTAL AND EXPORT SECTION ========== */
 .total-export {
   display: flex;
   justify-content: space-between;
@@ -117,7 +146,8 @@ thead {
   color: #333;
 }
 
-#exportBtn {
+#exportBtn,
+#pdfExportBtn {
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
   background-color: #28a745;
@@ -127,35 +157,12 @@ thead {
   cursor: pointer;
 }
 
-#exportBtn:hover {
+#exportBtn:hover,
+#pdfExportBtn:hover {
   background-color: #1e7e34;
 }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f5f7fa;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: 100%;
-  text-rendering: optimizeLegibility;
-}
 
-.container {
-  max-width: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
-}
-
-form input, form select {
-  font-size: 1rem;
-  -webkit-appearance: none; /* iOS dropdown fix */
-}
-
-form input::placeholder {
-  color: #999;
-}
-
+/* ========== RESPONSIVE ========== */
 @media screen and (max-width: 600px) {
   .filters, .total-export {
     flex-direction: column;

@@ -207,3 +207,15 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 
 // Initial Load
 renderCharts();
+
+document.getElementById('pdfExportBtn').addEventListener('click', () => {
+  const element = document.querySelector('.table-wrapper');
+  const opt = {
+    margin:       0.5,
+    filename:     'expenses.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
+});
